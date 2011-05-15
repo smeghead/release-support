@@ -43,6 +43,12 @@ sub message {
     };
 }
 
+sub html_format {
+    my $html = shift;
+
+    $html =~ s@(https?://[^ \n]+)@<a href="$1">$1</a>@gs;
+    return $html;
+}
 sub display_message {
     use HTML::Entities;
 
@@ -57,7 +63,9 @@ sub display_message {
     if ($type eq 'html') {
         $title = encode_entities($title, '<>&"');
         $template_prefix = encode_entities($template_prefix, '<>&"');
+        $template_prefix = html_format($template_prefix);
         $template_suffix = encode_entities($template_suffix, '<>&"');
+        $template_suffix = html_format($template_suffix);
         $points = encode_entities($points, '<>&"');
     }
     print <<"EOC";
