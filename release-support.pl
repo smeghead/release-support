@@ -20,6 +20,9 @@ print $version, "\n";
 
 sub message {
     my ($version) = @_;
+    my @urls = $config->param('basic.urls');
+    print "notify urls\n";
+    print " - $_\n" for @urls;
     my $title = $config->param('basic.title');
     $title =~ s/{VERSION}/$version/g;
     print $title, "\n";
