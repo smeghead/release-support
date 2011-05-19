@@ -21,8 +21,6 @@ print $version, "\n";
 sub message {
     my ($version) = @_;
     my @urls = $config->param('basic.urls');
-    print "notify urls\n";
-    print " - $_\n" for @urls;
     my $title = $config->param('basic.title');
     $title =~ s/{VERSION}/$version/g;
     print $title, "\n";
@@ -39,6 +37,7 @@ sub message {
     open my $points_handle, '<', $tmp_filename or die "$tmp_filename: $!\n";
     my $points = do {local $/; <$points_handle>};
     return {
+        urls => \@urls,
         title => $title,
         template_prefix => $template_prefix,
         points => $points,
@@ -80,6 +79,8 @@ $template_suffix
 EOC
 }
 my $message = message($version);
+print "notify urls\n";
+print " - $_\n" for @{$message->{urls}};
 display_message($message, 'text');
 display_message($message, 'html');
 
