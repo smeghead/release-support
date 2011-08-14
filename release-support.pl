@@ -11,26 +11,31 @@ use File::Copy;
 
 my $config_file = $ENV{'HOME'} . '/etc/release-support.conf';
 my $config = new Config::Simple($config_file);
-print $config->param('basic.productname'), "\n";
 
-die "require argument. $0 <version>\n" if scalar @ARGV == 0;
+die "require argument. $0 <product> <version>\n" if scalar @ARGV < 2;
 
-my $version = $ARGV[0];
+my $product = $ARGV[0];
+my $version = $ARGV[1];
+print $config->param($product . '.productname'), "\n";
 print $version, "\n";
 
+sub get_conf {
+    my $name = shift;
+    return $config->param("$product.$name");
+}
 sub message {
     my ($version) = @_;
-    my @urls = $config->param('basic.urls');
-    my $title = $config->param('basic.title');
+    my @urls = get_conf('urls');
+    my $title = get_conf('title');
     $title =~ s/{VERSION}/$version/g;
     print $title, "\n";
-    my $template_prefix = $config->param('basic.template_prefix');
+    my $template_prefix = get_conf('template_prefix');
     $template_prefix =~ s/{VERSION}/$version/g;
-    my $template_suffix = $config->param('basic.template_suffix');
+    my $template_suffix = get_conf('template_suffix');
     $template_suffix =~ s/{VERSION}/$version/g;
     my($tmp_fh, $tmp_filename) = tempfile();
     close $tmp_fh;
-    my $change_log = $config->param('basic.change_log');
+    my $change_log = get_conf('change_log');
     copy $change_log, $tmp_filename if $change_log;
     my $editor = $ENV{'EDITOR'} || 'vi';
     system "$editor $tmp_filename";
